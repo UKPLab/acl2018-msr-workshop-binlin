@@ -152,7 +152,7 @@ class CharBiLSTMHardAttn(BaseSeq2SeqModel):
             unnormalized_scores = self.output_layer(dec_output[0])
             logits = self.softmax(unnormalized_scores)
             topval, topidx = logits.data.topk(1)
-            prev_y_id = topidx[0][0]
+            prev_y_id = topidx.data.cpu().numpy()[0][0]
             total_decoded_len += 1
 
             # store result

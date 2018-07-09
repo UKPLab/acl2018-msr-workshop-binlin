@@ -19,7 +19,7 @@ class BTreeML(object):
 
         # first, make a decision if to insert to the left or to the right
         new_node_features = features_dict[new_node_nxid]
-        clf_input = np.asarray(new_node_features + self.features)
+        clf_input = np.asarray(self.features + new_node_features)
         # decision = get_gold_label(dg, new_node_nxid, self.nxid)
         decision = self.make_binary_prediction(clf_input, model)
 

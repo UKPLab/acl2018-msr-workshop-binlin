@@ -2,11 +2,13 @@
 # -*- coding: utf-8 -*-
 
 import logging
+import random
 from collections import OrderedDict
+from itertools import chain
 
 import networkx as nx
-from itertools import chain
-from components.constants import LEFT,RIGHT
+
+from components.constants import LEFT, RIGHT
 
 logger = logging.getLogger('main')
 
@@ -50,7 +52,7 @@ def get_gold_label(dg, node1_nxID, node2_nxID):
     node2_gold_id = dg.node[node2_nxID].get('GOLD_ID', None)
 
     try:
-        label = LEFT if int(node1_gold_id) < int(node2_gold_id) else RIGHT
+        label = RIGHT if int(node1_gold_id) < int(node2_gold_id) else LEFT
         return label
 
     except TypeError:
@@ -134,3 +136,13 @@ def bfs_order_node_dict(g, src):
     groups = OrderedDict(reversed(list(tempdict.items())))
 
     return groups
+
+def randomize_bfs(head_child_dict):
+    d = {}
+    for h, chs in head_child_dict.items():
+        # reverse_chs = chs[::-1]
+        random.shuffle(chs)
+        d[h] = chs
+
+    return d
+

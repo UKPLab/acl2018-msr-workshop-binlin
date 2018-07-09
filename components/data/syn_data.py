@@ -87,9 +87,9 @@ class SynData(BaseDataClass):
                 children_features = [SynFxtractor.extract_node_features(child_node_id, dg, self.vocab) for child_node_id in
                                      group]
 
-                gold_labels = [get_gold_label(dg, child_node_id, group_head_id) for child_node_id in group]
+                gold_labels = [get_gold_label(dg, group_head_id, child_node_id) for child_node_id in group]
                 for i, f in enumerate(children_features):
-                    xy_vecs.append(f + head_features + [gold_labels[i]])
+                    xy_vecs.append(head_features + f + [gold_labels[i]])
 
                 # 2. Sibling model features
                 # sbl_vecs now has the format:
@@ -100,13 +100,13 @@ class SynData(BaseDataClass):
                 # ]
                 for sbl_pair in get_combinations(zip(group, children_features), 2):
 
-                    node1_id = sbl_pair[0][0]
-                    node2_id = sbl_pair[1][0]
-
-                    feats1 = sbl_pair[0][1]
-                    feats2 = sbl_pair[1][1]
+                    node1_id, feats1 = sbl_pair[0]
+                    node2_id,feats2 = sbl_pair[1]
 
                     # correct way
+                    label = get_gold_label(dg, node1_id, node2_id)  # comparing node_id's of two siblings -> label
+                    xy_vecs.append(feats1 + feats2 + [label])  # putting their features and gold label together
+
                     label = get_gold_label(dg, node2_id, node1_id)  # comparing node_id's of two siblings -> label
                     xy_vecs.append(feats2 + feats1 + [label])  # putting their features and gold label together
 

@@ -116,11 +116,6 @@ class Engine(object):
 
             # Saving predictions, references and evaluating the predictions
             self.nlgen.save_predictions(dev_predictions, predictions_fname)
-            self.nlgen.save_dev_references(reference_fname)
-
-            logger.debug('Evaluating system performance (%s stage)', stage_name)
-            self.evaluator_module.external_metric_eval(ref_fn=reference_fname, pred_fn=predictions_fname)
-            self.evaluator_module.save_errors(self.nlgen.error_analysis_data, errors_fname)
 
         if self.data_module.fnames.test_fn != None:
             predictions_fname_base = '%s.test.%s' % (output_fname_base, stage_name)

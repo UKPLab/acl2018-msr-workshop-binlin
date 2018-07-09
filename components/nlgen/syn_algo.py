@@ -4,7 +4,7 @@ import logging
 from components.data.syn_fxtractor import SynFxtractor
 from components.nlgen.base_algo import BaseAlgo
 from components.nlgen.utils import BTreeML
-from components.utils.graph import bfs_order_node_dict
+from components.utils.graph import bfs_order_node_dict, randomize_bfs
 from components.utils.graph import dg_from_tokens
 from components.utils.graph import get_gold_label
 from components.utils.readers import UDConllDataProcessor
@@ -41,6 +41,7 @@ class SynAlgo(BaseAlgo):
 
         root_node = dg.graph['root']
         bfs_order_d = bfs_order_node_dict(dg, root_node)
+        bfs_order_d = randomize_bfs(bfs_order_d)  # randomize the child order
         all_features = SynFxtractor.extract_tree_features(dg, vocab)
         decisions = {}
 

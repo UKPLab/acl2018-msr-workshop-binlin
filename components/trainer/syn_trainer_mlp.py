@@ -91,9 +91,6 @@ class SRMLPTrainer(BaseTrainer):
         evaluator.plot_lcurve(fname = os.path.join(self.model_dir, "lcurve.pdf"),
                               title= self.model_type)
 
-        evaluator.save_errors(errors=nlgen.error_analysis_data,
-                              fname=os.path.join(self.model_dir, 'syn.dev.error-depgraphs.pkl'))
-
     def set_train_criterion(self, vocab_size, pad_id):
 
         # if weighting scheme:
