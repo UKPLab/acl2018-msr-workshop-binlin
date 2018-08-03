@@ -3,7 +3,16 @@
 Please use the following citation:
 
     ```
-    TBD
+   @InProceedings{W18-3602,
+        author    = 	"Puzikov, Yevgeniy and Gurevych, Iryna",
+        title     = 	"BinLin: A Simple Method of Dependency Tree Linearization",
+        booktitle = 	"Proceedings of the First Workshop on Multilingual Surface Realisation",
+        year      = 	"2018",
+        publisher = 	"Association for Computational Linguistics",
+        pages     = 	"13--28",
+        location  = 	"Melbourne, Australia",
+        url       = 	"http://aclweb.org/anthology/W18-3602"
+        }
     ```
 
 > **Abstract:**  
