@@ -3,7 +3,7 @@
 Please use the following citation:
 
     ```
-   @InProceedings{W18-3602,
+    @InProceedings{W18-3602,
         author    = 	"Puzikov, Yevgeniy and Gurevych, Iryna",
         title     = 	"BinLin: A Simple Method of Dependency Tree Linearization",
         booktitle = 	"Proceedings of the First Workshop on Multilingual Surface Realisation",
