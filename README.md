@@ -2,7 +2,6 @@
 
 Please use the following citation:
 
-    ```
     @InProceedings{W18-3602,
         author    = 	"Puzikov, Yevgeniy and Gurevych, Iryna",
         title     = 	"BinLin: A Simple Method of Dependency Tree Linearization",
@@ -12,8 +11,7 @@ Please use the following citation:
         pages     = 	"13--28",
         location  = 	"Melbourne, Australia",
         url       = 	"http://aclweb.org/anthology/W18-3602"
-        }
-    ```
+    }
 
 > **Abstract:**  
   Surface Realization Shared Task 2018 is a workshop on generating
