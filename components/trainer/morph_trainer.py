@@ -24,9 +24,6 @@ class MorphTrainer(BaseTrainer):
         train_batches = data.batchify_training_data(data.train, self.batch_size, is_dev_data=False)
         dev_batches = data.batchify_training_data(data.dev, self.batch_size, is_dev_data=True)
 
-        if self.use_cuda:
-            model.cuda()
-
         self.set_optimizer(model, self.config['optimizer'])
         self.set_train_criterion(model.output_size, data.vocab.PAD_ID)
 
@@ -86,9 +83,7 @@ class MorphTrainer(BaseTrainer):
         weight = torch.ones(num_classes)
         weight[pad_id] = 0.0
         self.criterion = nn.NLLLoss(weight=None, size_average=True)
-
-        if self.use_cuda:
-            self.criterion.cuda()
+        self.criterion.to(self.device)
 
     def calc_loss(self, logits, batch_data):
 

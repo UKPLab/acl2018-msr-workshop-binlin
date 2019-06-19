@@ -6,14 +6,12 @@ import time
 
 import torch
 import torch.nn as nn
-from torch.autograd import Variable
 
 from components.constants import PAD_ID
 from components.trainer.base_trainer import BaseTrainer
 from components.utils.readers import conll2snt
 from components.utils.readers import read_conll_data_file
 from components.utils.serialization import save_txt
-from components.utils.tensors import cuda_if_gpu
 from components.utils.timing import asMinutes
 
 logger = logging.getLogger('main')
@@ -38,9 +36,6 @@ class SRMLPTrainer(BaseTrainer):
 
         # need to move the model before setting the optimizer
         # see: http://pytorch.org/docs/stable/optim.html
-        if self.use_cuda:
-            model.cuda()
-
         self.set_optimizer(model, self.config['optimizer'])
         self.set_train_criterion(len(data.vocab.id2tok), PAD_ID)
 
@@ -100,21 +95,11 @@ class SRMLPTrainer(BaseTrainer):
         # weight = torch.ones(vocab_size)
         # weight[pad_id] = 0
         self.criterion = nn.BCELoss(size_average=True)
+        self.criterion.to(self.device)
 
-        if self.use_cuda:
-            self.criterion = self.criterion.cuda()
-
-    def train_step(self, model, np_xy_mat_pair):
-        x_var = cuda_if_gpu(Variable(
-            torch.from_numpy(
-                np_xy_mat_pair[0])))
-
-        y_var = cuda_if_gpu(Variable(
-            torch.from_numpy(
-                np_xy_mat_pair[1]).type(torch.FloatTensor))) # have to cast to float
-
-        logits = model.forward(x_var)  #
-        loss_var = self.calc_loss(logits, y_var)
+    def train_step(self, model, batch):
+        logits = model.forward(batch[0])  #
+        loss_var = self.calc_loss(logits, batch[1])
         return loss_var
 
     def calc_loss(self, logits, y_var):

@@ -10,8 +10,9 @@ from components.utils.timing import create_progress_bar
 logger = logging.getLogger('main')
 
 class BaseTrainer(object):
-    def __init__(self, config):
+    def __init__(self, config, device):
         self.config = config
+        self.device = device
         self.init_params()
 
     def init_params(self):
@@ -26,8 +27,6 @@ class BaseTrainer(object):
         self.external_evaluation = self.config["external_evaluation"]
         self.save_model = self.config["save_model_each_epoch"]
 
-        self.use_cuda = torch.cuda.is_available()
-
     def compute_val_loss(self, model, dev_batches):
 
         # Turn on training mode which disables dropout and BNorm.
@@ -39,7 +38,7 @@ class BaseTrainer(object):
 
         for batch_idx in bar(range(num_dev_batches)):
             loss_var = self.train_step(model, dev_batches[batch_idx])
-            loss_data = loss_var.data[0]
+            loss_data = loss_var.item()
 
             # Record loss
             running_losses = ([loss_data] + running_losses)[:20]
@@ -64,7 +63,7 @@ class BaseTrainer(object):
         for batch_idx in bar(range(num_train_batches)):
             self.optimizer.zero_grad()
             loss_var = self.train_step(model, train_batches[batch_idx])
-            loss_data = loss_var.data[0]
+            loss_data = loss_var.item()
             loss_var.backward()  # compute gradients
             self.optimizer.step()  # update weights
 

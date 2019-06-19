@@ -8,10 +8,14 @@ from components.utils.visualize import torch_summarize
 logger = logging.getLogger('main')
 
 class BaseModel(nn.Module):
-    def __init__(self, config):
+    def __init__(self, config, device):
         super(BaseModel, self).__init__()
         self.config = config
-        self.use_cuda = torch.cuda.is_available()
+        self.device = device
+
+    def move_to_device(self):
+        logger.debug('Moving the model to device: %s', self.device)
+        self.to(self.device)
 
 class BaseSeq2SeqModel(BaseModel):
 
@@ -25,6 +29,8 @@ class BaseSeq2SeqModel(BaseModel):
         # Print a model summary to make sure everything is as planned
         model_summary = torch_summarize(self)
         logger.debug('Model summary:\n %s', model_summary)
+
+        self.move_to_device()
 
     def set_flags(self):
         logger.warning('%s: no default flags', self.__class__.__name__)

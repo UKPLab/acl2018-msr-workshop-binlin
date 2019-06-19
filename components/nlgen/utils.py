@@ -1,4 +1,3 @@
-from components.utils.tensors import cuda_if_gpu
 import numpy as np
 import torch
 from torch.autograd import Variable
@@ -54,7 +53,7 @@ class BTreeML(object):
         return decision
 
     def make_binary_prediction(self, x, model):
-        logit = model(cuda_if_gpu(Variable(torch.from_numpy(x))))
+        logit = model(torch.from_numpy(x).to(model.device))
         logit_val = logit.cpu().data[0].numpy()
 
         if logit_val >= 0.5:

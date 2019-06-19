@@ -48,6 +48,8 @@ class SynMLP(BaseModel):
         model_summary = torch_summarize(self)
         logger.debug('Model summary:\n %s', model_summary)
 
+        self.move_to_device()
+
     def embedding_lookup(self, ids, *args, **kwargs):
         return self.embedding_mat(ids)
 

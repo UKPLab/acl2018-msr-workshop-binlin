@@ -12,7 +12,7 @@ import logging
 
 use_cuda = torch.cuda.is_available()
 
-def run_one_stage(mode, config_fn, seed=None):
+def run_one_stage(mode, config_fn, device, seed=None):
 
     config_d = load_yaml_config(config_fn)
 
@@ -37,11 +37,11 @@ def run_one_stage(mode, config_fn, seed=None):
     # fix random number generators' seeds
     fix_seed(config_d['random_seed'])
 
-    engine = Engine(config_d, mode)
+    engine = Engine(config_d, mode, device)
     engine.setup()
     engine.run()
 
-def run_pipeline(config_files, out_fn):
+def run_pipeline(config_files, out_fn, device):
     # In the pipeline mode we have two config files,
     # separate for each stage. First, we do syntactic ordering,
     # then surface realization.
@@ -107,6 +107,8 @@ def parse_args():
                         help='random seed value')
     parser.add_argument('-o', '--output', nargs='?',
                         help='output file storing pipeline predictions')
+    parser.add_argument('-d', '--device',
+                        help='device to run the experiments on', default='cpu')
 
     args = parser.parse_args()
 
@@ -119,18 +121,18 @@ if __name__ == '__main__':
     mode = argvs.mode
     seed = argvs.seed
     output_fn = argvs.output
-
+    device = torch.device(argvs.device)
     config_files = argvs.config
     num_config_files = len(config_files)
 
     if num_config_files == 1:
         assert mode in ['train', 'predict']
-        run_one_stage(mode, config_files[0], seed)
+        run_one_stage(mode, config_files[0], device, seed)
 
     elif num_config_files == 2:
         assert mode == 'pipeline', 'Wrong mode!'
         assert output_fn is not None, 'Provide an output file to store pipeline predictions!'
-        run_pipeline(config_files, output_fn)
+        run_pipeline(config_files, output_fn, device)
 
     else:
         raise NotImplementedError()

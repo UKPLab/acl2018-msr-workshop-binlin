@@ -6,7 +6,8 @@ import logging
 import os
 
 import numpy as np
-
+import torch
+from torch.autograd.variable import Variable
 from components.data.base_data import BaseDataClass
 from components.data.syn_fxtractor import SynFxtractor
 from components.data.vocabulary.syn_vocab import SynVocabulary
@@ -41,7 +42,7 @@ class SynData(BaseDataClass):
         self.dev = self.vectorize_graphs(dev_graphs)
 
         # Set the number of extracted features (need for the NN)
-        random_instance_x = self.dev[0, :-1]
+        random_instance_x = self.dev[0][0]
         self.num_features = len(random_instance_x)
 
     def prediction_setup(self):
@@ -72,7 +73,8 @@ class SynData(BaseDataClass):
         """
 
         # we have two models: parent-child (PC) and siblings (SBL)
-        xy_vecs = []
+        x_vecs = []
+        y_vecs = []
 
         for dg in depgraphs:
 
@@ -89,7 +91,8 @@ class SynData(BaseDataClass):
 
                 gold_labels = [get_gold_label(dg, child_node_id, group_head_id) for child_node_id in group]
                 for i, f in enumerate(children_features):
-                    xy_vecs.append(f + head_features + [gold_labels[i]])
+                    x_vecs.append(f + head_features)
+                    y_vecs.append(gold_labels[i])
 
                 # 2. Sibling model features
                 # sbl_vecs now has the format:
@@ -108,9 +111,11 @@ class SynData(BaseDataClass):
 
                     # correct way
                     label = get_gold_label(dg, node2_id, node1_id)  # comparing node_id's of two siblings -> label
-                    xy_vecs.append(feats2 + feats1 + [label])  # putting their features and gold label together
+                    x_vecs.append(feats2 + feats1)  # putting their features and gold label together
+                    y_vecs.append(label)
 
-        return np.asarray(xy_vecs)
+        return (Variable(torch.LongTensor(x_vecs)).to(self.device),
+                Variable(torch.FloatTensor(y_vecs)).to(self.device))
 
     def batchify_vectorized_data(self, xy_ids, batch_size, num_classes=1):
 
@@ -122,10 +127,10 @@ class SynData(BaseDataClass):
         :param batch_size:
         :return:
         """
-        num_batches = len(xy_ids) // batch_size
+        num_batches = xy_ids[0].shape[0] // batch_size
 
-        batches = [(xy_ids[bi * batch_size: (bi + 1) * batch_size, :-1],
-                    xy_ids[bi * batch_size: (bi + 1) * batch_size, -1:])
+        batches = [(xy_ids[0][bi * batch_size: (bi + 1) * batch_size],
+                    xy_ids[1][bi * batch_size: (bi + 1) * batch_size])
                    for bi in range(num_batches)]
 
         return batches

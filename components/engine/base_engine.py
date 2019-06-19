@@ -11,16 +11,16 @@ from components.utils.serialization import load_model
 from components.utils.serialization import save_yaml
 
 logger = logging.getLogger('main')
-use_cuda = torch.cuda.is_available()
 
 class Engine(object):
 
-    def __init__(self, config_dict, mode):
+    def __init__(self, config_dict, mode, device):
         super(Engine, self).__init__()
 
         config_dict['mode'] = mode
         self.config = config_dict
         self.mode = mode
+        self.device = device
 
     def setup(self):
         self.setup_data_module()
@@ -49,7 +49,7 @@ class Engine(object):
         data_module = self.config['data-module'] # fetch the relevant module
 
         DataClass = importlib.import_module(data_module).component # import class
-        data = DataClass(data_class_config = self.config["data_params"], global_config=self.config) # make an instance
+        data = DataClass(data_class_config = self.config["data_params"], global_config=self.config, device=self.device) # make an instance
         data.setup() # setup
 
         self.data_module = data # assign as one of the fields
@@ -59,7 +59,7 @@ class Engine(object):
         model_params = self.config["model_params"]
 
         ModelClass = importlib.import_module(model_module).component
-        model = ModelClass(model_params)
+        model = ModelClass(model_params, self.device)
         model.set_data_dependent_params(self.data_module)  # there are some data-specific params => pass data as arg
         model.setup()
 
@@ -81,7 +81,7 @@ class Engine(object):
         training_params = self.config['training_params']
 
         TrainingClass = importlib.import_module(training_module).component
-        trainer = TrainingClass(training_params)
+        trainer = TrainingClass(training_params, self.device)
 
         self.training_module = trainer
 
@@ -98,9 +98,6 @@ class Engine(object):
             output_fname_base = model_fname
 
         all_predictions = {}
-
-        if use_cuda:
-            self.model_module.cuda()
 
         if self.data_module.fnames.dev_fn != None:
             predictions_fname_base = '%s.dev.%s' % (output_fname_base, stage_name)

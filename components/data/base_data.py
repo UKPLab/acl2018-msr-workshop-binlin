@@ -15,7 +15,7 @@ class BaseDataClass(object):
     and preparing data for training and evaluating the models.
     """
 
-    def __init__(self, data_class_config, global_config):
+    def __init__(self, data_class_config, global_config, device):
 
         self.config = data_class_config
         self.global_config = global_config
@@ -25,6 +25,7 @@ class BaseDataClass(object):
 
         self.vocab = None
         self.vocab_fn = self.set_vocab_path()
+        self.device = device
 
     def set_fnames(self):
 
