@@ -12,7 +12,7 @@ from components.data.base_data import BaseDataClass
 from components.data.syn_fxtractor import SynFxtractor
 from components.data.vocabulary.syn_vocab import SynVocabulary
 from components.utils.combinatorics import get_combinations
-from components.utils.graph import bfs_order_node_dict, get_gold_label
+from components.utils.graph import get_bfs_tuples, get_gold_label
 from components.utils.graph import dg_from_tokens
 from components.utils.readers import raw_data_to_tokens
 from components.utils.readers import read_conll_data_file
@@ -79,11 +79,11 @@ class SynData(BaseDataClass):
         for dg in depgraphs:
 
             # Order the nodes according to the reversed BFS order.
-            bfs_order_groups = bfs_order_node_dict(dg, dg.graph['root'])
+            bfs_tuples = get_bfs_tuples(dg, dg.graph['root'])
 
             # For each head node and its children,
             # extract features for the nodes and assign LEFT/RIGHT labels
-            for group_head_id, group in bfs_order_groups.items():
+            for (group_head_id, group) in bfs_tuples:
 
                 head_features = SynFxtractor.extract_node_features(group_head_id, dg, self.vocab)
                 children_features = [SynFxtractor.extract_node_features(child_node_id, dg, self.vocab) for child_node_id in

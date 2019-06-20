@@ -1,0 +1,38 @@
+experiments_dir: /home/puzikov/var/experiments/msrw/syn/en
+log_level: DEBUG
+random_seed: 1
+
+mode: train
+stage: syn
+
+# If mode is 'predict', specify the model name,
+# e.g. /path/to/model/weights.epoch5
+model_fn:
+
+# Model module names
+data-module: components.data.syn_data
+model-module: components.model.syn_mlp
+training-module: components.trainer.syn_trainer_mlp
+evaluation-module: components.evaluator.syn_evaluator
+nlgen-module: components.nlgen.syn_algo
+
+data_params:
+  lower_case: False
+  # train/en-ud-train.filtered.conll
+  train_data: /home/puzikov/var/data/sr2018/ud_filtered/train/en-ud-train.filtered.conll
+  dev_data: /home/puzikov/var/data/sr2018/ud_filtered/dev/en-ud-dev.filtered.conll
+  test_data: /home/puzikov/var/data/sr2018/T1-input/dev/en-ud-dev.conll
+
+model_params:
+
+  embedding_dim: 100
+  embedding_proj_dim: 64
+  dense1_dim: 32
+
+training_params:
+  external_evaluation: False
+  save_model_each_epoch: True
+  n_epochs: 10
+  batch_size: 600
+  optimizer: Adam
+  learning_rate: 0.001

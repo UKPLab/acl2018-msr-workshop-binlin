@@ -111,26 +111,26 @@ def graph_branching_factors(g):
 def graph_node_attrs(g, attribute):
     return [n_attr[attribute] for n, n_attr in g.nodes(data=True) if len(g.succ[n]) == 0]
 
+def get_bfs_tuples(dg, root, reverse=True):
+    bfs_tuples = nx.bfs_successors(dg, root)
+    if reverse: # give bottom-up order of tuples
+        bfs_tuples = list(reversed(list(bfs_tuples)))
+    return bfs_tuples
 
-def bfs_order_node_dict(g, src):
-    """
-    A function which :
-        - performs BFS search over the nodes of the dependency tree
-        - reverses the resultant sequence
-        - converts the reversed sequence into a OrderedDict() w/ internal nodes as heads (called 'group heads') and
-        a list of their children as values (called 'groups' or 'group nodes')
-
-    :param g: target dependency tree (nx.DiGraph())
-    :param src: source root to start the BFS traversal from (dependency tree root node)
-    :return: OrderedDict():
-        key = group_head (some node_id)
-        value = group (a list of the form [node_id, node_id, node_id, ...])
-    """
-
-    tempdict = OrderedDict()
-    for head, mod in nx.algorithms.traversal.breadth_first_search.bfs_edges(g, source=src):
-        tempdict.setdefault(head, []).append(mod)
-
-    groups = OrderedDict(reversed(list(tempdict.items())))
-
-    return groups
+# def bfs_order_node_dict(g, src):
+#     """
+#     A function which :
+#         - performs BFS search over the nodes of the dependency tree
+#         - reverses the resultant sequence
+#         - converts the reversed sequence into a OrderedDict() w/ internal nodes as heads (called 'group heads') and
+#         a list of their children as values (called 'groups' or 'group nodes')
+#
+#     :param g: target dependency tree (nx.DiGraph())
+#     :param src: source root to start the BFS traversal from (dependency tree root node)
+#     :return: OrderedDict():
+#         key = group_head (some node_id)
+#         value = group (a list of the form [node_id, node_id, node_id, ...])
+#     """
+#
+#     bfs_tuples = nx.bfs_successors(g, src)
+#     return list(reversed(list(bfs_tuples)))

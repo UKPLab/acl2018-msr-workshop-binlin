@@ -74,7 +74,11 @@ class SynEvaluator(BaseEvaluator):
         ni = corpus_nist(refs, hyps, n=4)
         ed = compute_edit_distance(refs, hyps)
 
-        return Score(bleu=bl, nist=ni, edist=ed)
+        bleu_score = 100.0 * round(bl, 4)
+        edist_score = 100.0 * round(ed, 4)
+        nist_score = round(ni, 2)
+
+        return Score(bleu=bleu_score, nist=nist_score, edist=edist_score)
 
     @staticmethod
     def read_predictions_and_eval(ref_fn, hyp_fn, normalise=True):
@@ -97,16 +101,16 @@ class SynEvaluator(BaseEvaluator):
 
 def compute_edit_distance(refs, hyps):
 
-    total_len = 0.0
-    edi = 0.0
-    for r, h in zip(refs, hyps):
-        reference_snt = ' '.join(r[0])
-        hypothesis_snt = ' '.join(h)
-        total_len += max(len(reference_snt), len(hypothesis_snt))
-        edi += edit_distance(reference_snt, hypothesis_snt)
-
-    edist = 1 - edi / total_len
-    logger.info('[Unofficial edist: %0.4f]', edist)
+    # total_len = 0.0
+    # edi = 0.0
+    # for r, h in zip(refs, hyps):
+    #     reference_snt = ' '.join(r[0])
+    #     hypothesis_snt = ' '.join(h)
+    #     total_len += max(len(reference_snt), len(hypothesis_snt))
+    #     edi += edit_distance(reference_snt, hypothesis_snt)
+    #
+    # edist = 1 - edi / total_len
+    # logger.info('[Unofficial edist: %0.4f]', edist)
 
     total_len = 0.0
     edi = 0.0

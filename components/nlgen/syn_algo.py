@@ -4,12 +4,13 @@ import logging
 from components.data.syn_fxtractor import SynFxtractor
 from components.nlgen.base_algo import BaseAlgo
 from components.nlgen.utils import BTreeML
-from components.utils.graph import bfs_order_node_dict
+from components.utils.graph import get_bfs_tuples
 from components.utils.graph import dg_from_tokens
 from components.utils.graph import get_gold_label
 from components.utils.readers import UDConllDataProcessor
 from components.utils.serialization import load_pickle
 from components.utils.serialization import save_txt
+import random
 
 logger = logging.getLogger('main')
 
@@ -40,12 +41,12 @@ class SynAlgo(BaseAlgo):
     def predict_one(self, model, dg, vocab):
 
         root_node = dg.graph['root']
-        bfs_order_d = bfs_order_node_dict(dg, root_node)
+        bfs_tuples = get_bfs_tuples(dg, root_node)
         all_features = SynFxtractor.extract_tree_features(dg, vocab)
         decisions = {}
 
-        for head_node, children_nodes in bfs_order_d.items():
-
+        for (head_node, children_nodes) in bfs_tuples:
+            random.shuffle(children_nodes)
             # Init a binary tree for this group of nodes
             bintree = BTreeML(head_node, all_features[head_node])
             for child_node_id in children_nodes:
